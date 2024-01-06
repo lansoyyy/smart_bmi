@@ -1,8 +1,3 @@
-0 Oregano
-1 Malunggay
-2 Luya
-3 Lagundi
-4 Bayabas
-5 Bawang
-6 Ampalaya
-7 Aloe Vera
+0 Normal
+1 Overweight
+2 Underweight
