@@ -1,13 +1,11 @@
-import 'package:flutter/cupertino.dart';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../Components/Icon_Content.dart';
-import '../Components/Reusable_Bg.dart';
-import '../Components/RoundIcon_Button.dart';
-import '../constants.dart';
-import 'Results_Page.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:smart_bmi/Screens/Results_Page.dart';
+import 'package:tflite_v2/tflite_v2.dart';
 import '../Components/BottomContainer_Button.dart';
-import '../calculator_brain.dart';
 
 // ignore: must_be_immutable
 class InputPage extends StatefulWidget {
@@ -26,10 +24,94 @@ enum Gender {
 class _InputPageState extends State<InputPage> {
   //by default male will be selected
 
-  late Gender selectedGender = Gender.male;
-  int height = 180;
-  int weight = 50;
-  int age = 20;
+  late String output = '';
+
+  late File pickedImage;
+
+  bool isImageLoaded = false;
+
+  late List result;
+
+  late String accuracy = '';
+
+  late String name = '';
+
+  late String numbers = '';
+
+  final box = GetStorage();
+
+  getImageCamera(String imgsrc) async {
+    setState(() {
+      hasLoaded = false;
+    });
+    var tempStore = await ImagePicker().pickImage(
+      source: imgsrc == 'camera' ? ImageSource.camera : ImageSource.gallery,
+    );
+
+    setState(() {
+      pickedImage = File(tempStore!.path);
+      isImageLoaded = true;
+      applyModel(File(tempStore.path));
+      hasLoaded = true;
+    });
+  }
+
+  List works = [];
+
+  loadmodel() async {
+    try {
+      await Tflite.loadModel(
+        model: "assets/model/model_unquant.tflite",
+        labels: "assets/model/labels.txt",
+      );
+    } catch (e) {
+      print('error $e');
+    }
+
+    // works = jsonDecode(await rootBundle.loadString('assets/data/main.json'));
+
+    setState(() {
+      hasLoaded = true;
+    });
+  }
+
+  String str = '';
+
+  applyModel(File file) async {
+    var res = await Tflite.runModelOnImage(
+        path: file.path, // required
+        imageMean: 0.0, // defaults to 117.0
+        imageStd: 255.0, // defaults to 1.0
+        numResults: 2, // defaults to 5
+        threshold: 0.2, // defaults to 0.1
+        asynch: true);
+    setState(() {
+      result = res!;
+
+      str = result[0]['label'].toString().split(' ')[1];
+    });
+
+    box.write('plant', str);
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ResultPage(
+          resultText: str,
+        ),
+      ),
+    );
+  }
+
+  bool hasLoaded = false;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    loadmodel();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,19 +127,20 @@ class _InputPageState extends State<InputPage> {
             BottomContainer(
               text: 'UPLOAD IMAGE',
               onTap: () {
-                Calculate calc = Calculate(height: 500, weight: 300);
+                getImageCamera('gallery');
+                // Calculate calc = Calculate(height: 500, weight: 300);
 
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ResultPage(
-                      bmi: calc.result(),
-                      resultText: calc.getText(),
-                      advise: calc.getAdvise(),
-                      textColor: calc.getTextColor(),
-                    ),
-                  ),
-                );
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (context) => ResultPage(
+                //       bmi: calc.result(),
+                //       resultText: calc.getText(),
+                //       advise: calc.getAdvise(),
+                //       textColor: calc.getTextColor(),
+                //     ),
+                //   ),
+                // );
               },
             ),
             const SizedBox(
@@ -66,19 +149,20 @@ class _InputPageState extends State<InputPage> {
             BottomContainer(
               text: 'CAPTURE IMAGE',
               onTap: () {
-                Calculate calc = Calculate(height: 500, weight: 300);
+                getImageCamera('camera');
+                // Calculate calc = Calculate(height: 500, weight: 300);
 
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ResultPage(
-                      bmi: calc.result(),
-                      resultText: calc.getText(),
-                      advise: calc.getAdvise(),
-                      textColor: calc.getTextColor(),
-                    ),
-                  ),
-                );
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (context) => ResultPage(
+                //       bmi: calc.result(),
+                //       resultText: calc.getText(),
+                //       advise: calc.getAdvise(),
+                //       textColor: calc.getTextColor(),
+                //     ),
+                //   ),
+                // );
               },
             ),
           ],

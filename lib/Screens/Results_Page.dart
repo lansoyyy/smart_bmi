@@ -1,22 +1,24 @@
-import 'package:flutter/cupertino.dart';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:smart_bmi/Components/BottomContainer_Button.dart';
 import 'package:smart_bmi/constants.dart';
 import '../Components/Reusable_Bg.dart';
 
-class ResultPage extends StatelessWidget {
+class ResultPage extends StatefulWidget {
   final String resultText;
-  final String bmi;
-  final String advise;
-  final Color textColor;
 
-  const ResultPage(
-      {super.key,
-      required this.textColor,
-      required this.resultText,
-      required this.bmi,
-      required this.advise});
+  const ResultPage({
+    super.key,
+    required this.resultText,
+  });
 
+  @override
+  State<ResultPage> createState() => _ResultPageState();
+}
+
+class _ResultPageState extends State<ResultPage> {
+  var random = Random();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,55 +28,101 @@ class ResultPage extends StatelessWidget {
         ),
       ),
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.all(15.0),
-              alignment: Alignment.bottomCenter,
-              child: const Text(
-                'Your Result',
-                style: ktitleTextStyle,
-              ),
+          Container(
+            padding: const EdgeInsets.all(15.0),
+            alignment: Alignment.bottomCenter,
+            child: const Text(
+              'Your Result',
+              style: ktitleTextStyle,
             ),
           ),
-          Expanded(
-            flex: 5,
+          SizedBox(
+            height: 450,
             child: ReusableBg(
               colour: kactiveCardColor,
               cardChild: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  const SizedBox(
+                    height: 20,
+                  ),
                   Text(
-                    resultText,
-                    style: TextStyle(
-                      color: textColor,
-                      fontSize: 27.0,
+                    widget.resultText,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 32.0,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+                  const Divider(),
                   Text(
-                    bmi,
+                    widget.resultText == 'Underweight'
+                        ? (14 + random.nextDouble() * 4).toStringAsFixed(2)
+                        : widget.resultText == 'Normal'
+                            ? (18 + random.nextDouble() * 6).toStringAsFixed(2)
+                            : (25 + random.nextDouble() * 4).toStringAsFixed(2),
                     style: kBMITextStyle,
                   ),
                   const Text(
-                    'Normal BMI range:',
-                    style: klabelTextStyle,
-                  ),
-                  const Text(
-                    '18.5 - 25 kg/m2',
+                    'Estimated BMI',
                     style: kBodyTextStyle,
                   ),
-                  Text(
-                    advise,
-                    textAlign: TextAlign.center,
-                    style: kBodyTextStyle,
+                  const Divider(),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            widget.resultText == 'Underweight'
+                                ? '162.00 cm below'
+                                : widget.resultText == 'Normal'
+                                    ? '160.02 cm to 170.18 cm'
+                                    : '140.02 cm to 160.02 cm',
+                            style: kBodyTextStyle,
+                          ),
+                          const Text(
+                            'Estimated height',
+                            style: kBodyTextStyle,
+                          ),
+                        ],
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            widget.resultText == 'Underweight'
+                                ? '49.7 kg below'
+                                : widget.resultText == 'Normal'
+                                    ? '56 kg to 76 kg'
+                                    : '70 kg above',
+                            style: kBodyTextStyle,
+                          ),
+                          const Text(
+                            'Estimated weight',
+                            style: kBodyTextStyle,
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                   const SizedBox(
-                    height: 15.0,
+                    height: 25.0,
                   ),
+                  BottomContainer(
+                      text: 'Try again',
+                      onTap: () {
+                        Navigator.pop(context);
+                      }),
                 ],
               ),
             ),
