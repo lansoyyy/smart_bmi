@@ -40,6 +40,9 @@ class _InputPageState extends State<InputPage> {
 
   final box = GetStorage();
 
+  int age = 0;
+  String gender = 'Male';
+
   getImageCamera(String imgsrc) async {
     setState(() {
       hasLoaded = false;
@@ -93,13 +96,73 @@ class _InputPageState extends State<InputPage> {
 
     box.write('plant', str);
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ResultPage(
-          resultText: str,
-        ),
-      ),
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          content: StatefulBuilder(builder: (context, setState) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 20, right: 20),
+                  child: Column(
+                    children: [
+                      TextField(
+                        onChanged: (value) {
+                          setState(() {
+                            age = int.tryParse(value) ?? 0;
+                          });
+                        },
+                        decoration: const InputDecoration(
+                          labelText: 'Age',
+                        ),
+                      ),
+                      DropdownButtonFormField<String>(
+                        value: gender,
+                        onChanged: (value) {
+                          setState(() {
+                            gender = value!;
+                          });
+                        },
+                        decoration: const InputDecoration(
+                          labelText: 'Gender',
+                        ),
+                        items: <String>['Male', 'Female'].map((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          }),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ResultPage(
+                      age: age,
+                      gender: gender,
+                      resultText: str,
+                    ),
+                  ),
+                );
+              },
+              child: const Text(
+                'Continue',
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 

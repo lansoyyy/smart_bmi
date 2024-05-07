@@ -8,10 +8,15 @@ import '../Components/Reusable_Bg.dart';
 class ResultPage extends StatefulWidget {
   final String resultText;
 
+  final int age;
+  final String gender;
+
   const ResultPage({
-    super.key,
+    Key? key,
+    required this.age,
+    required this.gender,
     required this.resultText,
-  });
+  }) : super(key: key);
 
   @override
   State<ResultPage> createState() => _ResultPageState();
@@ -19,6 +24,17 @@ class ResultPage extends StatefulWidget {
 
 class _ResultPageState extends State<ResultPage> {
   var random = Random();
+
+  double calculateBMI(int age, String gender) {
+    // Add your BMI calculation logic here based on age and gender
+    // For simplicity, we'll use a random BMI calculation for demonstration purposes
+    if (gender == 'Male') {
+      return 22 + random.nextDouble() * 5; // Random BMI calculation for Male
+    } else {
+      return 21 + random.nextDouble() * 4; // Random BMI calculation for Female
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,88 +58,59 @@ class _ResultPageState extends State<ResultPage> {
             height: 450,
             child: ReusableBg(
               colour: kactiveCardColor,
-              cardChild: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Text(
-                    widget.resultText,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 32.0,
-                      fontWeight: FontWeight.bold,
+              cardChild: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const SizedBox(
+                      height: 20,
                     ),
-                  ),
-                  const Divider(),
-                  Text(
-                    widget.resultText == 'Underweight'
-                        ? (14 + random.nextDouble() * 4).toStringAsFixed(2)
-                        : widget.resultText == 'Normal'
-                            ? (18 + random.nextDouble() * 6).toStringAsFixed(2)
-                            : (25 + random.nextDouble() * 4).toStringAsFixed(2),
-                    style: kBMITextStyle,
-                  ),
-                  const Text(
-                    'Estimated BMI',
-                    style: kBodyTextStyle,
-                  ),
-                  const Divider(),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            widget.resultText == 'Underweight'
-                                ? '162.00 cm below'
-                                : widget.resultText == 'Normal'
-                                    ? '160.02 cm to 170.18 cm'
-                                    : '140.02 cm to 160.02 cm',
-                            style: kBodyTextStyle,
-                          ),
-                          const Text(
-                            'Estimated height',
-                            style: kBodyTextStyle,
-                          ),
-                        ],
+                    Text(
+                      widget.resultText,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 32.0,
+                        fontWeight: FontWeight.bold,
                       ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            widget.resultText == 'Underweight'
-                                ? '49.7 kg below'
-                                : widget.resultText == 'Normal'
-                                    ? '56 kg to 76 kg'
-                                    : '70 kg above',
-                            style: kBodyTextStyle,
-                          ),
-                          const Text(
-                            'Estimated weight',
-                            style: kBodyTextStyle,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 25.0,
-                  ),
-                  BottomContainer(
-                      text: 'Try again',
-                      onTap: () {
-                        Navigator.pop(context);
-                      }),
-                ],
+                    ),
+                    const Divider(),
+                    Text(
+                      calculateBMI(widget.age, widget.gender)
+                          .toStringAsFixed(2),
+                      style: kBMITextStyle,
+                    ),
+                    const Text(
+                      'Estimated BMI',
+                      style: kBodyTextStyle,
+                    ),
+                    const Divider(),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    const Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        // Add your height and weight calculation logic here based on age and gender
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 25.0,
+                    ),
+                    const SizedBox(
+                      height: 25.0,
+                    ),
+                    BottomContainer(
+                        text: 'Try again',
+                        onTap: () {
+                          // Recalculate BMI and update UI
+                          setState(() {});
+                        }),
+                    const SizedBox(
+                      height: 25.0,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
